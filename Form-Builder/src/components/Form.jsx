@@ -1,6 +1,7 @@
 import React from "react";
+import "../styles/Form.css";
 
-const Form = ({ field, formData, setFormData }) => {
+const Form = ({ field, formData, setFormData, errors }) => {
   const handleChange = (e) => {
     const { name, type, value, checked } = e.target;
     setFormData((prevData) => ({
@@ -11,14 +12,15 @@ const Form = ({ field, formData, setFormData }) => {
 
   if (field.type === "section") {
     return (
-      <div className="p-4 border border-gray-300 rounded-md my-4">
-        <h3 className="text-lg font-semibold">{field.label}</h3>
+      <div className="form-section">
+        <h3 className="section-title">{field.label}</h3>
         {field.fields.map((subField, index) => (
           <Form
             key={index}
             field={subField}
             formData={formData}
             setFormData={setFormData}
+            errors={errors}
           />
         ))}
       </div>
@@ -26,10 +28,11 @@ const Form = ({ field, formData, setFormData }) => {
   }
 
   return (
-    <div className="mb-4">
-      <label className="block text-sm font-medium text-gray-700">
+    <div className="form-group">
+      <label className="form-label">
         {field.label} {field.required && <span className="text-red-500">*</span>}
       </label>
+
       {field.type === "text" || field.type === "email" ? (
         <input
           type={field.type}
@@ -37,14 +40,14 @@ const Form = ({ field, formData, setFormData }) => {
           value={formData[field.name] || ""}
           onChange={handleChange}
           required={field.required}
-          className="mt-1 p-2 w-full border rounded-md"
+          className="form-input"
         />
       ) : field.type === "select" ? (
         <select
           name={field.name}
           value={formData[field.name] || ""}
           onChange={handleChange}
-          className="mt-1 p-2 w-full border rounded-md"
+          className="form-select"
         >
           <option value="">Select...</option>
           {field.options.map((option, index) => (
@@ -54,14 +57,19 @@ const Form = ({ field, formData, setFormData }) => {
           ))}
         </select>
       ) : field.type === "checkbox" ? (
-        <input
-          type="checkbox"
-          name={field.name}
-          checked={formData[field.name] || false}
-          onChange={handleChange}
-          className="mt-1"
-        />
+        <div className="checkbox-group">
+          <input
+            type="checkbox"
+            name={field.name}
+            checked={formData[field.name] || false}
+            onChange={handleChange}
+            className="form-checkbox"
+          />
+          <span>I agree to the terms and conditions</span>
+        </div>
       ) : null}
+
+      {errors[field.name] && <p className="error-message">{errors[field.name]}</p>}
     </div>
   );
 };
